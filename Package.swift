@@ -3,14 +3,17 @@
 import PackageDescription
 
 let package = Package(
-    name: "fixed-array-swift",
+    name: "fixed-size-array-swift",
     platforms: [
         .macOS(.v13),
     ],
     products: [
         .executable(
-            name: "generate-fixed-array",
-            targets: ["FixedArrayGenerator"])
+            name: "generate-fixed-size-array",
+            targets: ["FixedSizeArrayGenerator"]),
+        .library(
+            name: "FixedSizeArray",
+            targets: ["FixedSizeArray"]),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-algorithms", from: "1.0.0"),
@@ -18,13 +21,15 @@ let package = Package(
     ],
     targets: [
         .executableTarget(
-            name: "FixedArrayGenerator",
+            name: "FixedSizeArrayGenerator",
             dependencies: [
                 .product(name: "Algorithms", package: "swift-algorithms"),
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
             ]),
+        .target(
+            name: "FixedSizeArray"),
         .testTarget(
-            name: "FixedArrayTests",
-            dependencies: []),
+            name: "FixedSizeArrayTests",
+            dependencies: ["FixedSizeArray"]),
     ]
 )
