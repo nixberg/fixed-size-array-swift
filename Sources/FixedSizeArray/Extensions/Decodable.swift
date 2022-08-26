@@ -1,4 +1,4 @@
-// TODO: Remove AdditiveArithmetic requirement when `storage` allows for that.
+// TODO: Remove AdditiveArithmetic requirement when `storage` allows that.
 extension FixedSizeArray where Element: AdditiveArithmetic & Decodable {
     public init(from decoder: Decoder) throws {
         self.init()

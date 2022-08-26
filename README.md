@@ -1,9 +1,9 @@
-# fixed-array-swift
+# fixed-size-array-swift
 
 ## Example
 
 ```console
-> generate-fixed-array --public 32
+> generate-fixed-size-array --public 32
 ```
 
 ```swift
@@ -12,6 +12,7 @@
 import FixedSizeArray
 
 public struct Array32<Element>: FixedSizeArray {
+    
     public typealias Index = Int
     
     private var storage: (
