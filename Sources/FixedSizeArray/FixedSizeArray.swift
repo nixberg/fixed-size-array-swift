@@ -1,15 +1,60 @@
-public protocol FixedSizeArray:
+public protocol FixedSizeArray<Element>:
     CustomDebugStringConvertible,
     CustomReflectable,
     CustomStringConvertible,
     MutableCollection,
     RandomAccessCollection
 where Index == Int {
-    static var count: Int { get }
+    static var startIndex: Index { get }
+    
+    static var endIndex: Index { get }
     
     static var indices: Range<Index> { get }
     
+    static var count: Int { get }
+    
     init(repeating element: Element)
+    
+    var first: Element { get set }
+    
+    var last: Element { get set }
+}
+
+extension FixedSizeArray {
+    @inline(__always)
+    public static var startIndex: Index {
+        indices.startIndex
+    }
+    
+    @inline(__always)
+    public static var endIndex: Index {
+        indices.endIndex
+    }
+    
+    @inline(__always)
+    public static var count: Int {
+        indices.count
+    }
+    
+    @inline(__always)
+    public var first: Element {
+        get {
+            self[startIndex]
+        }
+        set {
+            self[startIndex] = newValue
+        }
+    }
+    
+    @inline(__always)
+    public var last: Element {
+        get {
+            self[endIndex - 1]
+        }
+        set {
+            self[endIndex - 1] = newValue
+        }
+    }
 }
 
 // MARK: -
@@ -45,26 +90,6 @@ extension FixedSizeArray {
             self.withUnsafeMutableBufferPointer {
                 $0[position] = newValue
             }
-        }
-    }
-    
-    @inline(__always)
-    public var first: Element {
-        get {
-            self[startIndex]
-        }
-        set {
-            self[startIndex] = newValue
-        }
-    }
-    
-    @inline(__always)
-    public var last: Element {
-        get {
-            self[endIndex - 1]
-        }
-        set {
-            self[endIndex - 1] = newValue
         }
     }
     
