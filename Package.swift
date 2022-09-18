@@ -4,9 +4,6 @@ import PackageDescription
 
 let package = Package(
     name: "fixed-size-array-swift",
-    platforms: [
-        .macOS(.v13),
-    ],
     products: [
         .executable(
             name: "generate-fixed-size-array",
