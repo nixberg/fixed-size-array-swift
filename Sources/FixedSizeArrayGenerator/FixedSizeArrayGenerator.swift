@@ -114,6 +114,8 @@ struct FixedSizeArrayGenerator: ParsableCommand {
         
         extension \(name): ExpressibleByArrayLiteral where Element: AdditiveArithmetic {}
         
+        extension \(name): ExpressibleByIntegerLiteral where Element: BinaryInteger {}
+        
         extension \(name): Hashable where Element: Hashable {}
         
         extension \(name): Sendable where Element: Sendable {}
@@ -122,7 +124,7 @@ struct FixedSizeArrayGenerator: ParsableCommand {
         import Subtle
         
         extension \(name): ConstantTimeEquatable where Element: ConstantTimeEquatable {}
-                
+        
         extension \(name): ConstantTimeSortable
         where Element: ConstantTimeGreaterThan & ConditionallyReplaceable {}
         
