@@ -14,22 +14,19 @@ fixed-size arrays in Swift.
 > generate-fixed-size-array --help
 OVERVIEW: Generate a fixed-size array implementation for Swift.
 
-USAGE: fixed-size-array-generator <count> [--element <element>] [--name <name>] [--conformance <conformance> ...] [--output-file <output-file>] [--public]
+USAGE: fixed-size-array-generator <count> [--output-file <output-file>] [--visibility <visibility>]
 
 ARGUMENTS:
   <count>                 The element count of the generated type.
 
 OPTIONS:
-  --element <element>     The element type of the generated type. By default, the type is generic.
-  --name <name>           The name of the generated type. (default: "Array\(count)")
-  --conformance <conformance>
-                          A protocol the generated type will conform to. Ignored when the type is
-                          generic.
   --output-file <output-file>
                           The output file.
-  --public                Generate a public type declaration.
-  --version               Show the version.
+  --visibility <visibility>
+                          Generate a public type declaration. (default: internal)
   -h, --help              Show help information.
+
+
 ```
 
 ---
@@ -41,112 +38,27 @@ OPTIONS:
 ```swift
 import FixedSizeArray
 
-struct Array3<Element>: FixedSizeArray {
-
-    typealias Index = Int
-    
-    private var storage: (
-        Element, Element, Element
-    )
-    
-    @inline(__always)
-    static var indices: Range<Index> {
-        0..<3
-    }
-    
-    @inline(__always)
-    init(repeating element: Element) {
-        storage = (
-            element, element, element
-        )
-    }
-    
-    @inline(__always)
-    init(
-        _ e0: Element,
-        _ e1: Element,
-        _ e2: Element
-    ) {
-        storage = (
-            e0,
-            e1,
-            e2
-        )
-    }
-}
-
 extension Array3: Decodable where Element: AdditiveArithmetic & Decodable {}
-
 extension Array3: Encodable where Element: Encodable {}
-
 extension Array3: Equatable where Element: Equatable {}
-
 extension Array3: ExpressibleByArrayLiteral where Element: AdditiveArithmetic {}
-
 extension Array3: Hashable where Element: Hashable {}
 
-extension Array3: Sendable where Element: Sendable {}
-
-#if canImport(Subtle)
-import Subtle
-
-extension Array3: ConstantTimeEquatable where Element: ConstantTimeEquatable {}
-        
-extension Array3: ConstantTimeSortable
-where Element: ConstantTimeGreaterThan & ConditionallyReplaceable {}
-
-extension Array3: Zeroizable where Element: Zeroizable {}
-#endif
-```
-
----
-
-```console
-> generate-fixed-size-array --conformance Hashable --conformance MyProtocol --element UInt8 --name MyType --public 3
-```
-
-```swift
-@_exported import FixedSizeArray
-
-public struct MyType: FixedSizeArray {
+struct Array3<Element>: FixedSizeArray {
+    typealias Index = Int
     
-    public typealias Element = UInt8
-
-    public typealias Index = Int
+    static var count: Int { 3 }
     
-    private var storage: (
-        Element, Element, Element
-    )
+    private var storage: (Element, Element, Element)
     
-    @inline(__always)
-    public static var indices: Range<Index> {
-        0..<3
+    init(repeating element: Element) {
+        storage = (element, element, element)
     }
     
-    @inline(__always)
-    public init(repeating element: Element) {
-        storage = (
-            element, element, element
-        )
-    }
-    
-    @inline(__always)
-    public init(
-        _ e0: Element,
-        _ e1: Element,
-        _ e2: Element
-    ) {
-        storage = (
-            e0,
-            e1,
-            e2
-        )
+    init(_ e0: Element, _ e1: Element, _ e2: Element) {
+        storage = (e0, e1, e2)
     }
 }
-
-extension MyType: Hashable {}
-
-extension MyType: MyProtocol {}
 ```
 
 ## Package Manager Plugin
@@ -162,17 +74,16 @@ MyPackage
 
 
 ```swift
-// swift-tools-version:5.7
+// swift-tools-version:5.9
 
 import PackageDescription
 
 let package = Package(
     name: "my-package",
-    platforms: [
-        .macOS(.v13),
-    ],
     dependencies: [
-        .package(url: "https://github.com/nixberg/fixed-size-array-swift", "0.1.0"..<"0.2.0"),
+        .package(
+            url: "https://github.com/nixberg/fixed-size-array-swift",
+            .upToNextMinor(from: "0.3.0")),
     ],
     targets: [
         .target(
@@ -191,7 +102,8 @@ let package = Package(
 ```json
 [
     {
-        "count": 3
+        "count": 3,
+        "visibility": "internal"
     },
     {
         "count": 9,

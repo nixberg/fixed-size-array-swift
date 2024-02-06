@@ -1,13 +1,10 @@
-// swift-tools-version: 5.7
+// swift-tools-version: 5.9
 
 import PackageDescription
 
 let package = Package(
     name: "fixed-size-array-swift",
     products: [
-        .executable(
-            name: "generate-fixed-size-array",
-            targets: ["generate-fixed-size-array"]),
         .library(
             name: "FixedSizeArray",
             targets: ["FixedSizeArray"]),
@@ -16,10 +13,12 @@ let package = Package(
             targets: ["FixedSizeArrayGeneratorPlugin"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-algorithms", from: "1.0.0"),
-        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.1.3"),
-        
-        .package(url: "https://github.com/nixberg/subtle-swift", "0.11.0"..<"0.12.0"),
+        .package(
+            url: "https://github.com/apple/swift-algorithms",
+            from: "1.0.0"),
+        .package(
+            url: "https://github.com/apple/swift-argument-parser",
+            from: "1.1.3"),
     ],
     targets: [
         .executableTarget(
@@ -37,10 +36,7 @@ let package = Package(
             name: "FixedSizeArray"),
         .testTarget(
             name: "FixedSizeArrayTests",
-            dependencies: [
-                "FixedSizeArray",
-                .product(name: "Subtle", package: "subtle-swift"),
-            ],
+            dependencies: ["FixedSizeArray"],
             exclude: ["fixed-size-arrays.json"],
             plugins: ["FixedSizeArrayGeneratorPlugin"]),
     ]

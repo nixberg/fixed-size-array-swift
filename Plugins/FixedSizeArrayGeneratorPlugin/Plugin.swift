@@ -8,28 +8,18 @@ struct FixedSizeArrayGeneratorPlugin: BuildToolPlugin {
     }
     
     struct ConfigurationEntry: Decodable {
-        enum Visibility: String, Codable {
+        enum Visibility: String, Codable, CustomStringConvertible {
             case `internal`
+            case `package`
             case `public`
+            
+            var description: String {
+                rawValue
+            }
         }
         
         let count: Int
         let visibility: Visibility
-        
-        var fileName: String {
-            "Array\(count).swift"
-        }
-        
-        enum CodingKeys: String, CodingKey {
-            case count
-            case visibility
-        }
-        
-        init(from decoder: Decoder) throws {
-            let values = try decoder.container(keyedBy: CodingKeys.self)
-            count = try values.decode(Int.self, forKey: .count)
-            visibility = (try? values.decode(Visibility.self, forKey: .visibility)) ?? .internal
-        }
     }
     
     func createBuildCommands(context: PluginContext, target: Target) throws -> [Command] {
@@ -44,22 +34,16 @@ struct FixedSizeArrayGeneratorPlugin: BuildToolPlugin {
         FileManager.default.cleanDirectory(context.pluginWorkDirectory)
         
         return configuration.map { entry in
-            let path = context.pluginWorkDirectory.appending(subpath: entry.fileName)
-            
-            var arguments: [CustomStringConvertible] = [
-                "--output-file", path
-            ]
-            if case .public = entry.visibility {
-                arguments.append("--public")
-            }
-            arguments.append(contentsOf: [
-                "--", entry.count
-            ])
-            
+            let fileName = "Array\(entry.count).swift"
+            let path = context.pluginWorkDirectory.appending(subpath: fileName)
             return .buildCommand(
-                displayName: "Generating \(entry.fileName)",
+                displayName: "Generating \(fileName)",
                 executable: executable,
-                arguments: arguments,
+                arguments: [
+                    "--output-file", path,
+                    "--visibility", entry.visibility,
+                    "--", entry.count
+                ],
                 outputFiles: [path])
         }
     }

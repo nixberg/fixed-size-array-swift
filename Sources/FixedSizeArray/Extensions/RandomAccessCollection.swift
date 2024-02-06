@@ -1,34 +1,29 @@
 extension FixedSizeArray {
-    @inline(__always)
-    public var startIndex: Index {
+    public var startIndex: Int {
         0
     }
     
-    @inline(__always)
-    public var endIndex: Index {
+    public var endIndex: Int {
         Self.count
     }
     
-    @inline(__always)
-    public subscript(position: Index) -> Element {
+    public subscript(index: Int) -> Element {
         get {
-            precondition(indices.contains(position), "Index out of range")
-            return self[unchecked: position]
+            precondition(indices.contains(index), "Index out of range")
+            return self[unchecked: index]
         }
         set {
-            precondition(indices.contains(position), "Index out of range")
-            self[unchecked: position] = newValue
+            precondition(indices.contains(index), "Index out of range")
+            self[unchecked: index] = newValue
         }
     }
     
-    @inline(__always)
     public mutating func withContiguousStorageIfAvailable<R>(
         _ body: (UnsafeBufferPointer<Element>) throws -> R
     ) rethrows -> R? {
         try self.withUnsafeBufferPointer(body)
     }
     
-    @inline(__always)
     public mutating func withContiguousMutableStorageIfAvailable<R>(
         _ body: (inout UnsafeMutableBufferPointer<Element>) throws -> R
     ) rethrows -> R? {

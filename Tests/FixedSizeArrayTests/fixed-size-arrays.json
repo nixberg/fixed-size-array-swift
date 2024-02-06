@@ -1,6 +1,7 @@
 [
     {
-        "count": 3
+        "count": 3,
+        "visibility": "internal"
     },
     {
         "count": 9,

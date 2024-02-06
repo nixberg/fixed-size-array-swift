@@ -1,74 +1,24 @@
 public protocol FixedSizeArray<Element>:
     CustomDebugStringConvertible,
-    CustomReflectable,
     CustomStringConvertible,
     MutableCollection,
     RandomAccessCollection
 where Index == Int {
-    static var startIndex: Index { get }
-    
-    static var endIndex: Index { get }
-    
-    static var indices: Range<Index> { get }
+    associatedtype Element
     
     static var count: Int { get }
     
     init(repeating element: Element)
-    
-    var first: Element { get set }
-    
-    var last: Element { get set }
-}
-
-extension FixedSizeArray {
-    @inline(__always)
-    public static var startIndex: Index {
-        indices.startIndex
-    }
-    
-    @inline(__always)
-    public static var endIndex: Index {
-        indices.endIndex
-    }
-    
-    @inline(__always)
-    public static var count: Int {
-        indices.count
-    }
-    
-    @inline(__always)
-    public var first: Element {
-        get {
-            self[startIndex]
-        }
-        set {
-            self[startIndex] = newValue
-        }
-    }
-    
-    @inline(__always)
-    public var last: Element {
-        get {
-            self[endIndex - 1]
-        }
-        set {
-            self[endIndex - 1] = newValue
-        }
-    }
 }
 
 // MARK: -
 
 extension FixedSizeArray where Element: AdditiveArithmetic {
-    public init() {
-        self.init(repeating: .zero)
-    }
-    
     public init(_ sequence: some Sequence<Element>) {
-        self.init()
-        var iterator = sequence.makeIterator()
+        self.init(repeating: .zero)
         var index = startIndex
-        while let element = iterator.next() {
+        for element in sequence {
+            precondition(index != endIndex, "Too many elements in sequence")
             self[index] = element
             index += 1
         }
@@ -79,8 +29,7 @@ extension FixedSizeArray where Element: AdditiveArithmetic {
 // MARK: -
 
 extension FixedSizeArray {
-    @inline(__always)
-    public subscript(unchecked position: Index) -> Element {
+    public subscript(unchecked position: Int) -> Element {
         get {
             self.withUnsafeBufferPointer {
                 $0[position]
@@ -93,7 +42,6 @@ extension FixedSizeArray {
         }
     }
     
-    @inline(__always)
     public func withUnsafeBufferPointer<R>(
         _ body: (UnsafeBufferPointer<Element>) throws -> R
     ) rethrows -> R {
@@ -105,7 +53,6 @@ extension FixedSizeArray {
         }
     }
     
-    @inline(__always)
     public mutating func withUnsafeMutableBufferPointer<R>(
         _ body: (UnsafeMutableBufferPointer<Element>) throws -> R
     ) rethrows -> R {

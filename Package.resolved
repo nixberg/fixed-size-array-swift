@@ -1,15 +1,6 @@
 {
   "pins" : [
     {
-      "identity" : "subtle-swift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/nixberg/subtle-swift",
-      "state" : {
-        "revision" : "bfe1e1a45656c05a89e8a677b3ee5215eeaef18e",
-        "version" : "0.11.0"
-      }
-    },
-    {
       "identity" : "swift-algorithms",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-algorithms",
