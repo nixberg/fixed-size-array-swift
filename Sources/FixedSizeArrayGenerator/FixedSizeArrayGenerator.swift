@@ -44,14 +44,16 @@ struct FixedSizeArrayGenerator: ParsableCommand {
             
             public static var count: Int { \(count) }
             
-            private var storage: (\(repeatElement("Element", count: count).joined(separator: ", ")))
+        \((0..<count).map({ "    private var e\($0): Element" }).joined(separator: "\n"))
             
-            public init(repeating element: Element) {
-                storage = (\(repeatElement("element", count: count).joined(separator: ", ")))
+            public init(repeating repeatedValue: Element) {
+        \((0..<count).map({ "        e\($0) = repeatedValue" }).joined(separator: "\n"))
             }
             
-            public init(\(String((0..<count).map({ "_ e\($0): Element" }).joined(by: ", ")))) {
-                storage = (\(String((0..<count).map({ "e\($0)" }).joined(by: ", "))))
+            public init(
+        \((0..<count).map({ "        _ e\($0): Element" }).joined(separator: ",\n"))
+            ) {
+        \((0..<count).map({ "        self.e\($0) = e\($0)" }).joined(separator: "\n"))
             }
         }
         """
