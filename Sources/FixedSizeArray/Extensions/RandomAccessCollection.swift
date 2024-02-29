@@ -25,29 +25,23 @@ extension FixedSizeArray {
     }
     
     public mutating func withContiguousMutableStorageIfAvailable<R>(
-        _ body: (inout UnsafeMutableBufferPointer<Element>) throws -> R
+        _ body: (inout UnsafeMutableBufferPointer<Self.Element>) throws -> R
     ) rethrows -> R? {
-        try self.withUnsafeMutableBufferPointer {
-            let baseAddress = $0.baseAddress
-            let count = $0.count
-            
-            var inoutBufferPointer = UnsafeMutableBufferPointer(
-                start: baseAddress,
-                count: count
-            )
-            
+        try self.withUnsafeMutableBufferPointer { bufferPointer in
+            var inoutBufferPointer = bufferPointer
             defer {
                 precondition(
-                    inoutBufferPointer.baseAddress == baseAddress &&
-                    inoutBufferPointer.count == count,
-                    """
-                    \(Self.self) withContiguousMutableStorageIfAvailable: \
-                    replacing the buffer is not allowed
-                    """
+                    inoutBufferPointer == bufferPointer,
+                    "\(Self.self) \(#function): replacing the buffer is not allowed"
                 )
             }
-            
             return try body(&inoutBufferPointer)
         }
+    }
+}
+
+extension UnsafeMutableBufferPointer {
+    fileprivate static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.baseAddress == rhs.baseAddress && lhs.count == rhs.count
     }
 }
