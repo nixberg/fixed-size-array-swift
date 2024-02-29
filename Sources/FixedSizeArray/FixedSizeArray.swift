@@ -29,38 +29,50 @@ extension FixedSizeArray where Element: AdditiveArithmetic {
 // MARK: -
 
 extension FixedSizeArray {
-    public subscript(unchecked position: Int) -> Element {
+    public subscript(unchecked index: Int) -> Element {
         get {
             self.withUnsafeBufferPointer {
-                $0[position]
+                $0[index]
             }
         }
         set {
             self.withUnsafeMutableBufferPointer {
-                $0[position] = newValue
+                $0[index] = newValue
             }
         }
+    }
+    
+    public func _withUnprotectedUnsafeBytes<R>(
+        _ body: (UnsafeRawBufferPointer) throws -> R
+    ) rethrows -> R {
+        try Swift._withUnprotectedUnsafeBytes(of: self, body)
     }
     
     public func withUnsafeBufferPointer<R>(
         _ body: (UnsafeBufferPointer<Element>) throws -> R
     ) rethrows -> R {
-        try withUnsafePointer(to: self) {
-            try body(UnsafeBufferPointer<Element>(
-                start: UnsafeRawPointer($0).assumingMemoryBound(to: Element.self),
-                count: Self.count
-            ))
+        try self.withUnsafeBytes {
+            try $0.withMemoryRebound(to: Element.self, body)
         }
+    }
+    
+    public func withUnsafeBytes<R>(
+        _ body: (UnsafeRawBufferPointer) throws -> R
+    ) rethrows -> R {
+        try Swift.withUnsafeBytes(of: self, body)
     }
     
     public mutating func withUnsafeMutableBufferPointer<R>(
         _ body: (UnsafeMutableBufferPointer<Element>) throws -> R
     ) rethrows -> R {
-        try withUnsafeMutablePointer(to: &self) {
-            try body(UnsafeMutableBufferPointer<Element>(
-                start: UnsafeMutableRawPointer($0).assumingMemoryBound(to: Element.self),
-                count: Self.count
-            ))
+        try self.withUnsafeMutableBytes {
+            try $0.withMemoryRebound(to: Element.self, body)
         }
+    }
+    
+    public mutating func withUnsafeMutableBytes<R>(
+        _ body: (UnsafeMutableRawBufferPointer) throws -> R
+    ) rethrows -> R {
+        try Swift.withUnsafeMutableBytes(of: &self, body)
     }
 }
